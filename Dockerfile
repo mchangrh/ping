@@ -3,7 +3,7 @@ FROM golang:alpine as builder
 WORKDIR /go/ping
 
 COPY . .
-RUN go build 
+RUN CGO_ENABLED=0 go build -a --trimpath --installsuffix cgo
 
 FROM scratch
 COPY --from=builder /go/ping/ping .
