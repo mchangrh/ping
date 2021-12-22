@@ -8,7 +8,6 @@ on:
 jobs:
   build_and_push:
     name: Build & Publish Docker Images
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
