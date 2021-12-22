@@ -30,6 +30,7 @@ func main() {
 }
 
 func pong(w http.ResponseWriter, r *http.Request) {
+	cors(&w)
 	nowTime := strconv.FormatInt(time.Now().UnixMilli(), 10)
 	w.Header().Set("meta-recv-ms", nowTime)
 	fmt.Fprint(w, "pong")
@@ -51,6 +52,11 @@ func echo(w http.ResponseWriter, r *http.Request) {
 }
 
 func pixel(w http.ResponseWriter, r *http.Request) {
+	cors(&w)
 	w.Header().Set("Content-Type", "image/gif")
 	w.Write([]byte(`GIF89a     !ù  ,       L ;`))
+}
+
+func cors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
