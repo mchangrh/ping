@@ -13,6 +13,8 @@ import (
 // port flag
 var port int
 
+const VERSION = "1.0.1"
+
 func main() {
 	flag.IntVar(&port, "port", 8080, "Specify the port to listen to.")
 	flag.Parse()
@@ -21,6 +23,7 @@ func main() {
 	http.HandleFunc("/echo/", echo)
 	http.HandleFunc("/code/", code)
 	http.HandleFunc("/ping", pong)
+	http.HandleFunc("/version", vers)
 	http.HandleFunc("/", pong)
 	// server setup
 	listenAddr := fmt.Sprint(":", port)
@@ -41,6 +44,11 @@ func code(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Error(w, httpCode, httpCodeInt)
+}
+
+func vers(w http.ResponseWriter, r *http.Request) {
+	cors(&w)
+	fmt.Fprint(w, VERSION)
 }
 
 func echo(w http.ResponseWriter, r *http.Request) {
