@@ -1,0 +1,32 @@
+name: Docker CI
+
+on: 
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build_and_push:
+    name: Build & Publish Docker Images
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Log in to GCR
+        uses: docker/login-action@v1.9.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2.5.0
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            COMMIT_TAG=${{ github.sha }}
+          tags: |
+            ghcr.io/mchangrh/ping:latest
+            ghcr.io/mchangrh/ping:${{ github.sha }}
