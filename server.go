@@ -21,9 +21,10 @@ func main() {
 	http.HandleFunc("/pixel.gif", pixel)
 	http.HandleFunc("/echo/", echo)
 	http.HandleFunc("/code/", code)
+	http.HandleFunc("/ping", pong)
 	http.HandleFunc("/", pong)
 	// server setup
-	listenAddr := fmt.Sprint("127.0.0.1:", port)
+	listenAddr := fmt.Sprint(":", port)
 	fmt.Printf("Server started at port %s", listenAddr)
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
