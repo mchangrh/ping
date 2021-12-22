@@ -27,7 +27,7 @@ func main() {
 	http.HandleFunc("/", pong)
 	// server setup
 	listenAddr := fmt.Sprint(":", port)
-	fmt.Printf("Server started at port %s", listenAddr)
+	fmt.Printf("mchangrh/ping v%s listening on port %s\n", VERSION, listenAddr)
 	log.Fatal(http.ListenAndServe(listenAddr, nil))
 }
 
