@@ -2,6 +2,7 @@ package main
 
 // imports
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -12,12 +13,26 @@ import (
 
 // port flag
 var port int
+var sslCertificate string
+var sslKey string
 
-const VERSION = "1.0.1"
+const VERSION = "1.0.2"
 
-func main() {
+func init() {
+	flag.StringVar(&sslCertificate, "ssl-cert", "", "path to SSL server certificate")
+	flag.StringVar(&sslKey, "ssl-key", "", "path to SSL private key")
 	flag.IntVar(&port, "port", 8080, "Specify the port to listen to.")
 	flag.Parse()
+}
+
+func main() {
+	err := server()
+	if err != nil {
+		log.Fatalf("server error %s", err)
+	}
+}
+
+func server() error {
 	// http routing
 	http.HandleFunc("/pixel.gif", pixel)
 	http.HandleFunc("/echo/", echo)
@@ -25,10 +40,30 @@ func main() {
 	http.HandleFunc("/ping", pong)
 	http.HandleFunc("/version", vers)
 	http.HandleFunc("/", pong)
+	cfg := &tls.Config{
+		MinVersion:               tls.VersionTLS12,
+		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		PreferServerCipherSuites: true,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+			tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		},
+	}
 	// server setup
 	listenAddr := fmt.Sprint(":", port)
 	fmt.Printf("mchangrh/ping v%s listening on port %s\n", VERSION, listenAddr)
-	log.Fatal(http.ListenAndServe(listenAddr, nil))
+	srv := &http.Server{
+		Addr:         listenAddr,
+		TLSConfig:    cfg,
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+	}
+	if sslCertificate != "" && sslKey != "" {
+		log.Print("listening on HTTPS")
+		return srv.ListenAndServeTLS(sslCertificate, sslKey)
+	}
+	return http.ListenAndServe(listenAddr, nil)
 }
 
 func pong(w http.ResponseWriter, r *http.Request) {
