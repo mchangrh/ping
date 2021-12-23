@@ -7,9 +7,6 @@ Type=simple
 ExecStart=/usr/local/bin/mchangrh-ping -port 8080
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=mchangrh-ping
 User=root
 Group=root
 
