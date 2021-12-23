@@ -1,0 +1,10 @@
+#!/sbin/openrc-run
+
+description="mchangrh-ping"
+command="/usr/local/bin/mchangrh-ping"
+command_args="-port 8080"
+
+depend() {
+  need localmount net
+  use logger
+}
