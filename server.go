@@ -16,7 +16,7 @@ var port int
 var sslCertificate string
 var sslKey string
 
-const VERSION = "1.0.2"
+const VERSION = "1.0.3"
 
 func init() {
 	flag.StringVar(&sslCertificate, "ssl-cert", "", "path to SSL server certificate")
@@ -73,6 +73,7 @@ func pong(w http.ResponseWriter, r *http.Request) {
 
 func code(w http.ResponseWriter, r *http.Request) {
 	httpCode := strings.TrimPrefix(r.URL.Path, "/code/")
+	httpCode = strings.Split(httpCode, "/")[0]
 	httpCodeInt, err := strconv.Atoi(httpCode)
 	if err != nil {
 		http.Error(w, "Invalid HTTP code", 400)
